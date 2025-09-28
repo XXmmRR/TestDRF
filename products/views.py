@@ -6,7 +6,7 @@ from .serializers import ProductSerializer
 from drf_spectacular.utils import extend_schema
 
 
-@extend_schema(tags=['Products'])
+@extend_schema(tags=["Products"])
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
