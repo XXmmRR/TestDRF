@@ -8,7 +8,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     UV_PYTHON_DOWNLOADS=never \
     UV_PROJECT_ENVIRONMENT=/app/.venv
 
-RUN apt-get update && apt-get install -y build-essential
+RUN apt-get update && \
+    apt-get install -y netcat-openbsd build-essential postgresql-client && \
+    rm -rf /var/lib/apt/lists/*
 
 COPY pyproject.toml uv.lock ./
 
@@ -18,4 +20,8 @@ RUN pip install uv && \
 EXPOSE 8000
 
 COPY . /app
+
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+CMD [ "uv" "run" "manage.py" "runserver" "0.0.0.0:8000"]
 
