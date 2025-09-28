@@ -8,7 +8,9 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from .models import Order
 from .serializers import OrderSerializer
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(tags=['Orders'])
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
@@ -18,10 +20,11 @@ class OrderViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         queryset = Order.objects.all().select_related('user').prefetch_related('items__product')
+        
         if user.is_staff:
             return queryset
-        return queryset.filter(user=user)
-    
+        
+        return queryset.filter(user=user)    
     # Создаем заказ в транзакции
     @transaction.atomic
     def create(self, request, *args, **kwargs):
