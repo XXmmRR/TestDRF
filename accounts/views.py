@@ -8,7 +8,7 @@ from .serializers import UserRegistrationSerializer
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]
     serializer_class = UserRegistrationSerializer
-    
+
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
@@ -16,5 +16,16 @@ class UserRegistrationView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class MyTokenObtainPairView(TokenObtainPairView):
     pass
+
+
+class HealthCheckView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        """
+        Проверка работоспособности сервиса.
+        """
+        return Response({"status": "ok"}, status=status.HTTP_200_OK)
