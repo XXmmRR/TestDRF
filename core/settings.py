@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'rest_framework',
     "drf_spectacular",
     # local apps
-    'api',
     'accounts',
     'orders',
     'products',
