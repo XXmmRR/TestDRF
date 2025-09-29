@@ -7,6 +7,11 @@ services:
       - .env.dev
     restart: on-failure
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379" 
+    restart: always
   web:
     build: .
     command: uv run manage.py runserver 0.0.0.0:8000
@@ -24,5 +29,19 @@ services:
       retries: 3
     volumes:
       - .:/app
+
+  celery-worker:
+    build: .
+    command: celery -A core worker -l info
+    depends_on:
+      - db
+      - redis
+      - web
+    env_file:
+      - .env.dev
+    restart: on-failure
+    volumes:
+      - .:/app
+
 volumes:
   pgdata:
