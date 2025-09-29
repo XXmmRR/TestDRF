@@ -1,6 +1,7 @@
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+from .managers import UserManager
 
 class User(AbstractUser):
     username = None
@@ -9,6 +10,8 @@ class User(AbstractUser):
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
+    
+    objects = UserManager()
 
     groups = models.ManyToManyField(
         "auth.Group",
@@ -22,7 +25,7 @@ class User(AbstractUser):
     )
     user_permissions = models.ManyToManyField(
         "auth.Permission",
-        related_name="accounts_users",  # Уникальное имя для прав доступа
+        related_name="accounts_users",
         blank=True,
         help_text="Specific permissions for this user.",
         verbose_name="user permissions",

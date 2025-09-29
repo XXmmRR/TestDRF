@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import UserRegistrationSerializer
+from .serializers import UserRegistrationSerializer, MyTokenObtainPairSerializer
 
 
 class UserRegistrationView(APIView):
@@ -19,8 +19,8 @@ class UserRegistrationView(APIView):
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
-    pass
-
+    serializer_class = MyTokenObtainPairSerializer
+    username_field = 'email'
 
 class HealthCheckView(APIView):
     permission_classes = [AllowAny]
