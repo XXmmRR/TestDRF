@@ -195,7 +195,7 @@ SPECTACULAR_SETTINGS = {
 
 # Email
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
 # Celery
 
@@ -207,6 +207,9 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
+# Перевожу CELERY в синхронный режим для тестов
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES_EXCEPTIONS = True
 
 CELERY_IMPORTS = (
     'orders.tasks',

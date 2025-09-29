@@ -43,5 +43,15 @@ services:
     volumes:
       - .:/app
 
+  test:
+    build: .
+    command: pytest
+    depends_on:
+      - db
+    env_file:
+      - .env.dev
+    volumes:
+      - .:/app
+
 volumes:
   pgdata:

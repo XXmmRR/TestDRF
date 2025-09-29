@@ -5,6 +5,7 @@ from django.urls import reverse
 from orders.models import Order, OrderItem
 from products.models import Product
 from accounts.models import User
+from django.core import mail
 
 ORDERS_LIST_URL = reverse("order-list")
 
@@ -170,3 +171,25 @@ def test_admin_can_filter_all_orders_by_status(api_client, user_data, setup_orde
     
     response_no_filter = api_client.get(list_url)
     assert len(response_no_filter.data['results']) == 4
+
+
+@pytest.mark.django_db
+def test_order_creation_sends_confirmation_email(authenticated_user_client, order_data, user_data):
+    user, _ = user_data
+    
+    assert len(mail.outbox) == 0
+    
+    response = authenticated_user_client.post(ORDERS_LIST_URL, order_data, format="json")
+    assert response.status_code == status.HTTP_201_CREATED
+    
+    assert len(mail.outbox) == 1
+    
+    email = mail.outbox[0]
+    
+    order_id = response.data['id']
+    expected_subject = f'Подтверждение заказа #{order_id}'
+    assert email.subject == expected_subject
+    
+    assert email.to == [user.email]
+    
+    assert str(order_id) in email.body
