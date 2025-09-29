@@ -20,7 +20,8 @@ class UserRegistrationView(APIView):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
-    username_field = 'email'
+    username_field = "email"
+
 
 class HealthCheckView(APIView):
     permission_classes = [AllowAny]

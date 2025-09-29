@@ -10,6 +10,7 @@ from .serializers import OrderSerializer, AdminOrderSerializer
 from drf_spectacular.utils import extend_schema
 from .tasks import send_order_confirmation_email
 
+
 @extend_schema(tags=["Orders"])
 class OrderViewSet(viewsets.ModelViewSet):
     filter_backends = [DjangoFilterBackend, OrderingFilter]
@@ -26,14 +27,18 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         # ДЛЯ DRF-SPECTACULAR
         if getattr(self, "swagger_fake_view", False):
-            return queryset.all() 
+            return queryset.all()
 
         if user.is_staff:
             return queryset
 
         return queryset.filter(user=user)
+
     def get_serializer_class(self):
-        if self.action in ["set_status", "update", "partial_update"] and self.request.user.is_staff:
+        if (
+            self.action in ["set_status", "update", "partial_update"]
+            and self.request.user.is_staff
+        ):
             return AdminOrderSerializer
         return OrderSerializer
 
@@ -44,8 +49,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         order = serializer.save(user=self.request.user)
         send_order_confirmation_email.delay(
-            order_id=order.id, 
-            recipient_email=order.user.email
+            order_id=order.id, recipient_email=order.user.email
         )
 
     @action(detail=True, methods=["patch"], permission_classes=[IsAdminUser])
