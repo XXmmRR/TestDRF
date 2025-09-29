@@ -24,11 +24,14 @@ class OrderViewSet(viewsets.ModelViewSet):
             .prefetch_related("items__product")
         )
 
+        # ДЛЯ DRF-SPECTACULAR
+        if getattr(self, "swagger_fake_view", False):
+            return queryset.all() 
+
         if user.is_staff:
             return queryset
 
         return queryset.filter(user=user)
-
     def get_serializer_class(self):
         if self.action in ["set_status", "update", "partial_update"] and self.request.user.is_staff:
             return AdminOrderSerializer

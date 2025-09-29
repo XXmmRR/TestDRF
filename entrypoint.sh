@@ -13,4 +13,12 @@ echo "Apply database migrations"
 
 uv run manage.py migrate
 
+echo "Apply tests"
+uv run pytest
+
+if [ $? -ne 0 ]; then
+    echo "Tests failed! Exiting."
+    exit 1
+fi
+
 uv run "$@"
