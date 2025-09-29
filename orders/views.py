@@ -7,13 +7,12 @@ from django.db import transaction
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from .models import Order
-from .serializers import OrderSerializer
+from .serializers import OrderSerializer, AdminOrderSerializer
 from drf_spectacular.utils import extend_schema
 
 
 @extend_schema(tags=["Orders"])
 class OrderViewSet(viewsets.ModelViewSet):
-    serializer_class = OrderSerializer
     filter_backends = [DjangoFilterBackend, OrderingFilter]
     filterset_fields = ["status"]
     ordering_fields = ["created_at", "total_price"]
@@ -31,7 +30,11 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         return queryset.filter(user=user)
 
-    # Создаем заказ в транзакции
+    def get_serializer_class(self):
+        if self.action in ["set_status", "update", "partial_update"] and self.request.user.is_staff:
+            return AdminOrderSerializer
+        return OrderSerializer
+
     @transaction.atomic
     def create(self, request, *args, **kwargs):
         return super().create(request, *args, **kwargs)
@@ -42,17 +45,11 @@ class OrderViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["patch"], permission_classes=[IsAdminUser])
     def set_status(self, request, pk=None):
         order = self.get_object()
-        new_status = request.data.get("status")
-
-        if new_status and new_status in [choice[0] for choice in Order.STATUS_CHOICES]:
-            order.status = new_status
-            order.save()
-            return Response(
-                {"status": f"Статус заказа #{order.id} изменен на '{new_status}'."}
-            )
-
+        serializer = self.get_serializer(order, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(
-            {"error": "Некорректный статус"}, status=status.HTTP_400_BAD_REQUEST
+            {"status": f"Статус заказа #{order.id} изменен на '{order.status}'."}
         )
 
     def get_permissions(self):

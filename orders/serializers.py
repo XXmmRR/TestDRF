@@ -54,3 +54,9 @@ class OrderSerializer(serializers.ModelSerializer):
         order.save()
 
         return order
+
+
+class AdminOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ["status"]
