@@ -1,16 +1,16 @@
 ## Структура
 
-| Компонент | Назначение |
-| :--- | :--- |
-| `accounts/` | Модель пользователя (Custom User Model), аутентификация. |
-| `products/` | Управление списком продуктов. |
-| `orders/` | Управление заказами|
-| `core/settings.py` | Основные настройки Django. |
-| `core/celery.py`, `orders/tasks.py` | Настройка и задачи Celery. |
-| `tests/` | Набор тестов Pytest (Unit/Integration). |
-| `docker-compose.dev.yml` | Конфигурация для локальной разработки. |
-| `docker-compose.prod.yml` | Конфигурация для прода. |
 
+| Компонент                  | Назначение                                                                     |
+| :------------------------------------ | :----------------------------------------------------------------------------------------- |
+| `accounts/`                         | Модель пользователя (Custom User Model), аутентификация. |
+| `products/`                         | Управление списком продуктов.                                  |
+| `orders/`                           | Управление заказами                                                    |
+| `core/settings.py`                  | Основные настройки Django.                                              |
+| `core/celery.py`, `orders/tasks.py` | Настройка и задачи Celery.                                               |
+| `tests/`                            | Набор тестов Pytest (Unit/Integration).                                       |
+| `docker-compose.dev.yml`            | Конфигурация для локальной разработки.                 |
+| `docker-compose.prod.yml`           | Конфигурация для прода.                                              |
 
 ### 1\. Запуск Сервисов
 
@@ -24,9 +24,9 @@ docker compose -f docker-compose.dev.yml up --build -d
 
 После успешного запуска сервисы будут доступны:
 
-  * **Документация API ** `http://localhost:8000/api/docs/`
+* **Документация API ** `http://localhost:8000/api/docs/`
 
------
+---
 
 ## ✅ Тестирование (Development)
 
@@ -40,7 +40,7 @@ docker compose -f docker-compose.dev.yml up --build -d
 docker compose -f docker-compose.dev.yml run --rm test
 ```
 
------
+---
 
 ## ☁️ Продакшен (Deployment)
 
@@ -48,10 +48,10 @@ docker compose -f docker-compose.dev.yml run --rm test
 
 ### 1\. Подготовка Продакшен-Файла
 
-1.  Создайте файл переменных окружения для продакшена:
-    ```bash
-    cp env.sample .env.prod
-    ```
+1. Создайте файл переменных окружения для продакшена:
+   ```bash
+   cp env.sample .env.prod
+   ```
 
 ### 2\. Запуск Продакшен-Среды
 
@@ -60,10 +60,14 @@ docker compose -f docker-compose.dev.yml run --rm test
 ```bash
 docker compose -f docker-compose.prod.yml up --build -d
 ```
+
 ### 3\. Создание миграций
+
 Запустит временный контейнер, выполнит команду и удалит контейнер.
 
+```bash
 docker compose -f docker-compose.dev.yml run --rm web python manage.py makemigrations
+```
 
 Миграции применяются автоматически в entrypoint.sh
 
@@ -82,19 +86,20 @@ curl -X POST http://localhost:8000/api/auth/token/ \
      }'
 ```
 
------
+---
 
 ### 4.2\. Продукты (Только для Админа)
 
 Операции требуют токена администратора.
 
-| Операция | Метод | Команда |
-| :--- | :--- | :--- |
-| **Создать** | `POST` | \`\`\`bash
-curl -X POST http://localhost:8000/api/products/  
-\-H "Authorization: Bearer ${ACCESS\_TOKEN}"  
-\-H 'Content-Type: application/json'  
-\-d '{"name": "Ноутбук", "price": 1299.99, "stock": 10}'
+
+| Операция                                                | Метод | Команда |
+| :---------------------------------------------------------------- | :----------- | :--------------- |
+| **Создать**                                              | `POST`     | \`\`\`bash     |
+| curl -X POST http://localhost:8000/api/products/                |            |                |
+| \-H "Authorization: Bearer ${ACCESS\_TOKEN}"                    |            |                |
+| \-H 'Content-Type: application/json'                            |            |                |
+| \-d '{"name": "Ноутбук", "price": 1299.99, "stock": 10}' |            |                |
 
 ````|
 | **Список** | `GET` | ```bash
