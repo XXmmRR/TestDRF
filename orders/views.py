@@ -8,7 +8,7 @@ from rest_framework.filters import OrderingFilter
 from .models import Order
 from .serializers import OrderSerializer, AdminOrderSerializer
 from drf_spectacular.utils import extend_schema
-
+from .tasks import send_order_confirmation_email
 
 @extend_schema(tags=["Orders"])
 class OrderViewSet(viewsets.ModelViewSet):
@@ -42,7 +42,11 @@ class OrderViewSet(viewsets.ModelViewSet):
         return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        order = serializer.save(user=self.request.user)
+        send_order_confirmation_email.delay(
+            order_id=order.id, 
+            recipient_email=order.user.email
+        )
 
     @action(detail=True, methods=["patch"], permission_classes=[IsAdminUser])
     def set_status(self, request, pk=None):
